@@ -736,13 +736,17 @@ var a2 = TweenMax.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 		public var _yoyo:Boolean;
 		
 		/**
+		 * 01. TweenMax
 		 * Constructor
 		 *  
-		 * @param target Target object (or array of objects) whose properties this tween affects 
+		 * @param target Target object (or array of objects) whose properties this tween affects
 		 * @param duration Duration in seconds (or frames if <code>useFrames:true</code> is set in the <code>vars</code> parameter)
 		 * @param vars An object defining the end value for each property that should be tweened as well as any special properties like <code>onComplete</code>, <code>ease</code>, etc. For example, to tween <code>mc.x</code> to 100 and <code>mc.y</code> to 200 and then call <code>myFunction</code>, do this: <code>new TweenMax(mc, 1, {x:100, y:200, onComplete:myFunction})</code>.
 		 */
 		public function TweenMax(target:Object, duration:Number, vars:Object) {
+			/*
+			   부모 클래스인  Tweenlite 의 생성자를 호출
+			 */
 			super(target, duration, vars);
 			_yoyo = (this.vars.yoyo == true);
 			_repeat = int(this.vars.repeat);
@@ -1191,12 +1195,13 @@ TweenMax.to([mc1, mc2, mc3], 1, {x:100});
 		 * @see com.greensock.TimelineLite#to()
 		 * @see com.greensock.TimelineLite#staggerTo()
 		 */
+		/* 02. TweenMax.to */
 		public static function to(target:Object, duration:Number, vars:Object):TweenMax {
 			return new TweenMax(target, duration, vars);
 		}
-		
+
 		/**
-		 * Static method for creating a TweenMax instance that tweens backwards - 
+		 * Static method for creating a TweenMax instance that tweens backwards -
 		 * you define the <strong>BEGINNING</strong> values and the current values are used
 		 * as the destination values which is great for doing things like animating objects
 		 * onto the screen because you can set them up initially the way you want them to look 

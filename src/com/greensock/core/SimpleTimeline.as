@@ -52,7 +52,8 @@ package com.greensock.core {
 		
 		/**
 		 * Constructor
-		 * 
+		 * SimpleTimeline은 가장 기본적인 타임 라인 기능을 제공하는 TimelineLite 및 TimelineMax의 기본 클래스이며 TweenLite의 루트 타임 라인에 사용되지만
+		 * GreenSock 트위닝 플랫폼의 내부 용도로만 사용됩니다. 매우 빠르고 가볍습니다.
 		 * @param vars Object containing configuration variables like onComplete, onUpdate, onStart, data, etc.
 		 */
 		public function SimpleTimeline(vars:Object=null) {

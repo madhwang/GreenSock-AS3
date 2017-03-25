@@ -442,6 +442,10 @@ package com.greensock {
 		 * @param vars An object defining the end value for each property that should be tweened as well as any special properties like <code>onComplete</code>, <code>ease</code>, etc. For example, to tween <code>mc.x</code> to 100 and <code>mc.y</code> to 200 and then call <code>myFunction</code>, do this: <code>new TweenLite(mc, 1, {x:100, y:200, onComplete:myFunction})</code>.
 		 */
 		public function TweenLite(target:Object, duration:Number, vars:Object) {
+			/*
+			부모 클래스인  Animation  클래스의 생성자를 호출.
+			target 은 여기서 가지고 있는다.
+		    */
 			super(duration, vars);
 			
 			if (target == null) {
@@ -458,7 +462,11 @@ package com.greensock {
 			_ease = defaultEase; //temporary - we'll replace it in _init(). We need to set it here for speed purposes so that on the first render(), it doesn't throw an error. 
 			
 			_overwrite = (!("overwrite" in this.vars)) ? _overwriteLookup[defaultOverwrite] : (typeof(this.vars.overwrite) === "number") ? this.vars.overwrite >> 0 : _overwriteLookup[this.vars.overwrite];
-			
+
+			/*
+			 target 이 배열인지 여부에 따라  _register  함수를 호출하거나 static Dictionary  인 _tweenLookup  에 추가하지만,
+			 _register() 도 내부적으로는  _tweenLookup  에 추가한다.
+			 */
 			if (this.target is Array && typeof(this.target[0]) === "object") {
 				_targets = this.target.concat();
 				_propLookup = [];

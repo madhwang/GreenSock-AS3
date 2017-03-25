@@ -176,7 +176,9 @@ Animation.ticker.removeEventListener("tick", myFunction);
 		
 		/**
 		 * Constructor 
-		 * 
+		 *  TweenLite/Max, TimelieLite/Max 클래스의 기본 클래스이며, 핵심 메서드/properties/기능을 제공하지만 인스턴스를 직접 만들 필요는 없음.
+		 *  그러나 트윈이나 타임 라인을 포함 할 수있는 메서드 / 속성에 대한 AS3 / AS2의 데이터 유형으로 매우 유용 할 수 있습니다.
+		 *  예를 들어, 많은 사용자 정의 클래스에 대해 animateIn () 및 animateOut () 메서드를 작성하고 각각은 트위닝이나 타임 라인이 될 수있는 Animation 인스턴스를 반환합니다.
 		 * @param duration duration in seconds (or frames for frames-based tweens)
 		 * @param vars configuration variables (for example, <code>{x:100, y:0, opacity:0.5, onComplete:myFunction}</code>)
 		 */
@@ -191,7 +193,15 @@ Animation.ticker.removeEventListener("tick", myFunction);
 			_totalTime = _time = 0;
 			data = this.vars.data;
 			_rawPrevTime = -1;
-			
+
+			/*
+			  static SimpleTimeline  타입인  _rootTimeline 과  _rootFramesTimeline  을 생성한다.
+			  이미 있으면  return  명령으로 컨트롤을 리턴한다.
+			 _rootTimeline -  우리가 일반적으로 사용하는 시간값으로 컨트롤 하는  timeline
+			 _rootFramesTimeline -  프레임 단위로 컨트롤 하는  timeline
+
+			   SimpleTimeLine  은  Animation 의 자식 클래스
+			 */
 			if (_rootTimeline == null) {
 				if (_rootFrame == -1) {
 					_rootFrame = 0;
