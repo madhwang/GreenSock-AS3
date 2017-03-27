@@ -1539,8 +1539,8 @@ myAnimation.seek("myLabel");
 			}
 			var totalDur:Number = (!_dirty) ? _totalDuration : totalDuration(), 
 				prevTime:Number = _time, 
-				prevStart:Number = _startTime, 
-				prevTimeScale:Number = _timeScale, 
+				prevStart:Number = _startTime,  //Animation 의 생성자에서 초기화.  _rootTimeline._startTime.
+				prevTimeScale:Number = _timeScale,  //Animaion의 생성자에서 초기화
 				prevPaused:Boolean = _paused,
 				tween:Animation, isComplete:Boolean, next:Animation, callback:String, internalForce:Boolean;
 			if (time >= totalDur) {

@@ -1910,7 +1910,7 @@ myTween.totalDuration(10); //sets the total duration
 			if (!arguments.length) {
 				if (_dirty) {
 					//instead of Infinity, we use 999999999999 so that we can accommodate reverses
-					_totalDuration = (_repeat == -1) ? 999999999999 : _duration * (_repeat + 1) + (_repeatDelay * _repeat);
+					_totalDuration = (_repeat == -1) ? 999999999999 : _duration * (_repeat + 1) + (_repeatDelay * _repeat); // _repeat, _duration, _repeateDelay 모두 생성자에서 받은 값들
 					_dirty = false;
 				}
 				return _totalDuration;

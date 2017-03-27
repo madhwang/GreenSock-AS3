@@ -491,7 +491,11 @@ package com.greensock {
 					}
 				}
 			}
-			
+
+			/*
+			여기서 랜더링 한다. render 의 경우 Animation 클래스에 추상 메서드로 정의되어 있고, 자식 클래스인 tweenlite,tweenmax,simpletime 에
+			  모두 오버라이드 되어 있다.
+			 */
 			if (this.vars.immediateRender || (duration == 0 && _delay == 0 && this.vars.immediateRender != false)) {
 				render(-_delay, false, true);
 			}
@@ -631,6 +635,11 @@ package com.greensock {
 		override public function render(time:Number, suppressEvents:Boolean=false, force:Boolean=false):void {
 			var isComplete:Boolean, callback:String, pt:PropTween, rawPrevTime:Number, prevTime:Number = _time;
 			if (time >= _duration) {
+				/*
+				_totalTime =  Animation 클래스의 생성자에서 초기화
+				_time = Animation 클래스의 생성자에서 초기화
+				_duration = Animation 클래스의 생성자에서 초기화
+				 */
 				_totalTime = _time = _duration;
 				ratio = _ease._calcEnd ? _ease.getRatio(1) : 1;
 				if (!_reversed) {
@@ -639,6 +648,7 @@ package com.greensock {
 				}
 				if (_duration == 0) { //zero-duration tweens are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
 					rawPrevTime = _rawPrevTime;
+					// _timeline - Animation 클래스에서 가지고 있는 SimpleTimelite 형의 멤버변수
 					if (_startTime === _timeline._duration) { //if a zero-duration tween is at the VERY end of a timeline and that timeline renders at its end, it will typically add a tiny bit of cushion to the render time to prevent rounding errors from getting in the way of tweens rendering their VERY end. If we then reverse() that timeline, the zero-duration tween will trigger its onReverseComplete even though technically the playhead didn't pass over it again. It's a very specific edge case we must accommodate.
 						time = 0;
 					}
@@ -1328,7 +1338,7 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 			return changed;
 		}
 		
-		/** 
+		/**
 		 * @private 
 		 * Checks if a tween overlaps with a particular global time value. "reference" is the point in time on the global (root) timeline, 
 		 * and if the tween overlaps with it, 0 is returned. If the tween starts AFTER the reference, the difference between the two (positive 
@@ -1358,4 +1368,5 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 	}
 	
 }
+
 
