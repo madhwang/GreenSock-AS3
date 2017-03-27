@@ -751,7 +751,8 @@ var a2 = TweenMax.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 			_yoyo = (this.vars.yoyo == true);
 			_repeat = int(this.vars.repeat);
 			_repeatDelay = this.vars.repeatDelay || 0;
-			_dirty = true; //ensures that if there is any repeat, the _totalDuration will get recalculated to accurately report it.
+
+			_dirty = true; //ensures that if there is any repeat, the _totalDuration will get recalculated to accurately report it. 반복이 있으면 _totalDuration이 정확하게 다시 계산되도록 다시 계산됩니다.
 			if (this.vars.onCompleteListener || this.vars.onUpdateListener || this.vars.onStartListener || this.vars.onRepeatListener || this.vars.onReverseCompleteListener) {
 				_initDispatcher();
 				if (_duration == 0) if (_delay == 0) if (this.vars.immediateRender) {
@@ -860,20 +861,31 @@ tween.updateTo({x:300, y:0}, false);
 		 * Renders the tween at a particular time (or frame number for frames-based tweens). 
 		 * The time is based simply on the overall duration. For example, if a tween's duration
 		 * is 3, <code>renderTime(1.5)</code> would render it at the halfway finished point.
-		 * 
+		 *  _totalDuration  -
+		 *  @see com.greensock.core.Animation
 		 * @param time time (or frame number for frames-based tweens) to render.
 		 * @param suppressEvents If true, no events or callbacks will be triggered for this render (like onComplete, onUpdate, onReverseComplete, etc.)
 		 * @param force Normally the tween will skip rendering if the time matches the cachedTotalTime (to improve performance), but if force is true, it forces a render. This is primarily used internally for tweens with durations of zero in TimelineLite/Max instances.
+		 * 일반적으로, 시간이 (성능을 향상시키기 위해) cachedTotalTime과 일치하면 트윈은 렌더링을 건너 뜁니다. 그러나 force가 true이면 렌더가 강제로 렌더링됩니다. 주로 TimelineLite / Max 인스턴스의 지속 시간이 0 인 트윈의 경우 내부적으로 사용됩니다.
 		 */
 		override public function render(time:Number, suppressEvents:Boolean=false, force:Boolean=false):void {
-			if (!_initted) if (_duration === 0 && vars.repeat) { //zero duration tweens that render immediately have render() called from TweenLite's constructor, before TweenMax's constructor has finished setting _repeat, _repeatDelay, and _yoyo which are critical in determining totalDuration() so we need to call invalidate() which is a low-kb way to get those set properly.
-				invalidate();
-			}
-			var totalDur:Number = (!_dirty) ? _totalDuration : totalDuration(), 
+			if (!_initted) /* 애니메이션이 초기화되었는지 여부를 나타냅니다 (트윈의 경우 모든 트위닝 속성이 분석되고 시작 / 끝 값이 기록되는 경우 등). */
+				if (_duration === 0 && vars.repeat) { //zero duration tweens that render immediately have render() called from TweenLite's constructor, before TweenMax's constructor has finished setting _repeat, _repeatDelay, and _yoyo which are critical in determining totalDuration() so we need to call invalidate() which is a low-kb way to get those set properly.
+					invalidate();
+				}
+			/*
+			 _totalTime =  Animation 클래스의 생성자에서 0으로 초기화
+			 _time = Animation 클래스의 생성자에서 0으로 초기화
+			 _duration = Animation 클래스의 생성자에서 초기화
+			 _dirty =  tweenmax  생성자에서 초기화
+			 */
+			var totalDur:Number = (!_dirty) ? _totalDuration : totalDuration(),
 				prevTime:Number = _time,
 				prevTotalTime:Number = _totalTime, 
 				prevCycle:Number = _cycle, 
 				isComplete:Boolean, callback:String, pt:PropTween, rawPrevTime:Number;
+
+			/*   time  값은 음수화 되어 넘어온다. 그렇다면 이 조건은  time(_delay) 값이 전체 수행시간보다 큰경우가 된다.*/
 			if (time >= totalDur) {
 				_totalTime = totalDur;
 				_cycle = _repeat;
@@ -889,7 +901,11 @@ tween.updateTo({x:300, y:0}, false);
 					callback = "onComplete";
 				}
 				if (_duration == 0) { //zero-duration tweens are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
+
+					/*주로 시작 시간과 종료 시간을 렌더링할지 여부를 제어하는 상위 타임 라인에서 시간의 방향 / 기세를 결정하기 위해 제로 지속 시간 트윈에 사용됩니다. 사용법은 render () 메서드를 참조하십시오 (타임 라인 대 트윈에서는 약간 다릅니다) */
 					rawPrevTime = _rawPrevTime;
+
+					// _timeline - Animation 클래스에서 가지고 있는 SimpleTimelite 형의 멤버변수
 					if (_startTime === _timeline._duration) { //if a zero-duration tween is at the VERY end of a timeline and that timeline renders at its end, it will typically add a tiny bit of cushion to the render time to prevent rounding errors from getting in the way of tweens rendering their VERY end. If we then reverse() that timeline, the zero-duration tween will trigger its onReverseComplete even though technically the playhead didn't pass over it again. It's a very specific edge case we must accommodate.
 						time = 0;
 					}
@@ -923,6 +939,22 @@ tween.updateTo({x:300, y:0}, false);
 			} else {
 				_totalTime = _time = time;
 				if (_repeat != 0) {
+					/*
+
+					_duration, _totalDuration은  Animation  생성자에서  duration(tween 세팅시 설정하는 타임 값)  또는  0 으로 초기화 된다.
+					_totalDuration  은 이 함수의 시작 부분에서 totalDuration()  에 의해서 바뀔 수 있다.
+
+					_totalTime  은  Animation  생성자에서  _time 과 함께 0으로 초기화 된다.
+
+					_duration - 애니메이션의 지속 시간으로, 반복 또는 repeatDelays는 포함되지 않습니다 (TweenMax 및 TimelineMax에서만 사용 가능).
+					예를 들어, TweenMax 인스턴스의 지속 시간이 2이고 반복 횟수가 3 인 경우 totalDuration은 8입니다 (표준 재생(1) + 3회 반복(3) =  반복 반복 4 회*2).
+
+					_totalDuration - 모든 반복 또는 repeatDelays (TweenMax 및 TimelineMax에서만 사용할 수 있음)를 포함한 애니메이션의 총 재생 시간입니다.
+					예를 들어, TweenMax 인스턴스의 지속 시간이 2이고 반복 횟수가 3 인 경우 totalDuration은 8입니다 (표준 재생(1) + 3회 반복(3) =  반복 반복 4 회*2)
+
+					_totalTime - repeat 및 repeatDelays (TweenMax 및 TimelineMax에서만 사용할 수 있음)를 포함하여 재생 헤드의 전체 위치입니다. 예를 들어, TweenMax 인스턴스의 지속 시간이 2이고 반복 횟수가 3 인 경우
+					totalTime 은 트윈 과정에서 0에서 8로 이동합니다 (한 번 재생 한 다음 3 번 반복하여 총 4 사이클 반복 ) 반면  time </ code>은 0에서 2까지 총 4 회가됩니다.
+					 */
 					var cycleDuration:Number = _duration + _repeatDelay;
 					_cycle = (_totalTime / cycleDuration) >> 0; //originally _totalTime % cycleDuration but floating point errors caused problems, so I normalized it. (4 % 0.8 should be 0 but Flash reports it as 0.79999999!)
 					if (_cycle !== 0) if (_cycle === _totalTime / cycleDuration) {
@@ -939,6 +971,7 @@ tween.updateTo({x:300, y:0}, false);
 					}
 				}
 				if (_easeType) {
+					/*  _time = time  이 된다*/
 					var r:Number = _time / _duration, type:int = _easeType, pow:int = _easePower;
 					if (type == 1 || (type == 3 && r >= 0.5)) {
 						r = 1 - r;
@@ -970,11 +1003,19 @@ tween.updateTo({x:300, y:0}, false);
 					ratio = _ease.getRatio(_time / _duration);
 				}
 			}
-			
+
+			/*  prevTime  은    이 함수 시작 부분에서  _time 으로 0으로 초기화 되었고,
+			_time  값은  Animation  클래스에서 0으로 초기화 되었다.
+			_cycle  는 반복횟수.
+
+			_totalTime  은  if, else if, else  구문 내에서 바뀐다.
+			 */
 			if (prevTime == _time && !force && _cycle === prevCycle) {
-				if (prevTotalTime !== _totalTime) if (_onUpdate != null) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
-					_onUpdate.apply(vars.onUpdateScope || this, vars.onUpdateParams);
-				}
+				if (prevTotalTime !== _totalTime)
+					if (_onUpdate != null)
+						if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
+							_onUpdate.apply(vars.onUpdateScope || this, vars.onUpdateParams);
+						}
 				return;
 			} else if (!_initted) {
 				_init();
@@ -988,9 +1029,12 @@ tween.updateTo({x:300, y:0}, false);
 					ratio = _ease.getRatio((_time === 0) ? 0 : 1);
 				}
 			}
+
 			if (!_active) if (!_paused && _time !== prevTime && time >= 0) {
 				_active = true;  //so that if the user renders a tween (as opposed to the timeline rendering it), the timeline is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the tween already finished but the user manually re-renders it as halfway done.
 			}
+
+
 			if (prevTotalTime == 0) {
 				if (_startAt != null) {
 					if (time >= 0) {
@@ -1027,6 +1071,7 @@ tween.updateTo({x:300, y:0}, false);
 					_onUpdate.apply(null, vars.onUpdateParams);
 				}
 			}
+
 			if (_hasUpdateListener) {
 				if (time < 0 && _startAt != null && _onUpdate == null && _startTime != 0) {
 					_startAt.render(time, suppressEvents, force);
@@ -1035,6 +1080,7 @@ tween.updateTo({x:300, y:0}, false);
 					_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.UPDATE));
 				}
 			}
+
 			if (_cycle != prevCycle) if (!suppressEvents) if (!_gc) {
 				if (vars.onRepeat) {
 					vars.onRepeat.apply(null, vars.onRepeatParams);
@@ -1043,6 +1089,7 @@ tween.updateTo({x:300, y:0}, false);
 					_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.REPEAT));
 				}
 			}
+
 			if (callback) if (!_gc) { //check gc because there's a chance that kill() could be called in an onUpdate
 				if (time < 0 && _startAt != null && _onUpdate == null && !_hasUpdateListener && _startTime != 0) { //if the tween is positioned at the VERY beginning (_startTime 0) of its parent timeline, it's illegal for the playhead to go back further, so we should not render the recorded startAt values.
 					_startAt.render(time, suppressEvents, true);
