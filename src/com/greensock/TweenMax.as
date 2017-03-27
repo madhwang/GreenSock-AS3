@@ -1038,7 +1038,7 @@ tween.updateTo({x:300, y:0}, false);
 			if (prevTotalTime == 0) {
 				if (_startAt != null) {
 					if (time >= 0) {
-						_startAt.render(time, suppressEvents, force);
+						_startAt.render(time, suppressEvents, force); //TweenLite  의  render
 					} else if (!callback) {
 						callback = "_dummyGS"; //if no callback is defined, use a dummy value just so that the condition at the end evaluates as true because _startAt should render AFTER the normal render loop when the time is negative. We could handle this in a more intuitive way, of course, but the render loop is the MOST important thing to optimize, so this technique allows us to avoid adding extra conditional logic in a high-frequency area.
 					}
@@ -1090,28 +1090,29 @@ tween.updateTo({x:300, y:0}, false);
 				}
 			}
 
-			if (callback) if (!_gc) { //check gc because there's a chance that kill() could be called in an onUpdate
-				if (time < 0 && _startAt != null && _onUpdate == null && !_hasUpdateListener && _startTime != 0) { //if the tween is positioned at the VERY beginning (_startTime 0) of its parent timeline, it's illegal for the playhead to go back further, so we should not render the recorded startAt values.
-					_startAt.render(time, suppressEvents, true);
-				}
-				if (isComplete) {
-					if (_timeline.autoRemoveChildren) {
-						_enabled(false, false);
+			if (callback)
+				if (!_gc) { //check gc because there's a chance that kill() could be called in an onUpdate
+					if (time < 0 && _startAt != null && _onUpdate == null && !_hasUpdateListener && _startTime != 0) { //if the tween is positioned at the VERY beginning (_startTime 0) of its parent timeline, it's illegal for the playhead to go back further, so we should not render the recorded startAt values.
+						_startAt.render(time, suppressEvents, true);
 					}
-					_active = false;
-				}
-				if (!suppressEvents) {
-					if (vars[callback]) {
-						vars[callback].apply(null, vars[callback + "Params"]);
+					if (isComplete) {
+						if (_timeline.autoRemoveChildren) {
+							_enabled(false, false);
+						}
+						_active = false;
 					}
-					if (_dispatcher) {
-						_dispatcher.dispatchEvent(new TweenEvent(((callback == "onComplete") ? TweenEvent.COMPLETE : TweenEvent.REVERSE_COMPLETE)));
+					if (!suppressEvents) {
+						if (vars[callback]) {
+							vars[callback].apply(null, vars[callback + "Params"]);
+						}
+						if (_dispatcher) {
+							_dispatcher.dispatchEvent(new TweenEvent(((callback == "onComplete") ? TweenEvent.COMPLETE : TweenEvent.REVERSE_COMPLETE)));
+						}
+					}
+					if (_duration === 0 && _rawPrevTime === _tinyNum && rawPrevTime !== _tinyNum) { //the onComplete or onReverseComplete could trigger movement of the playhead and for zero-duration tweens (which must discern direction) that land directly back on their start time, we don't want to fire again on the next render. Think of several addPause()'s in a timeline that forces the playhead to a certain spot, but what if it's already paused and another tween is tweening the "time" of the timeline? Each time it moves [forward] past that spot, it would move back, and since suppressEvents is true, it'd reset _rawPrevTime to _tinyNum so that when it begins again, the callback would fire (so ultimately it could bounce back and forth during that tween). Again, this is a very uncommon scenario, but possible nonetheless.
+						_rawPrevTime = 0;
 					}
 				}
-				if (_duration === 0 && _rawPrevTime === _tinyNum && rawPrevTime !== _tinyNum) { //the onComplete or onReverseComplete could trigger movement of the playhead and for zero-duration tweens (which must discern direction) that land directly back on their start time, we don't want to fire again on the next render. Think of several addPause()'s in a timeline that forces the playhead to a certain spot, but what if it's already paused and another tween is tweening the "time" of the timeline? Each time it moves [forward] past that spot, it would move back, and since suppressEvents is true, it'd reset _rawPrevTime to _tinyNum so that when it begins again, the callback would fire (so ultimately it could bounce back and forth during that tween). Again, this is a very uncommon scenario, but possible nonetheless.
-					_rawPrevTime = 0;
-				}
-			}
 		}
 		
 		
