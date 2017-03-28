@@ -493,13 +493,16 @@ package com.greensock {
 			}
 
 			/*
-			여기서 랜더링 한다. render 의 경우 Animation 클래스에 추상 메서드로 정의되어 있고, 자식 클래스인 tweenlite,tweenmax,simpletime 에
+			    render 의 경우 Animation 클래스에 추상 메서드로 정의되어 있고, 자식 클래스인 tweenlite,tweenmax,simpletime 에
 			  모두 오버라이드 되어 있다.
 			  따라서  각각의 인스턴스의  render()  메서드가 호출된다.
 			   ex>   TweenMax  인스턴스의 경우 실제코드상으로는  TweenLite 의  render() 메서드를 호출하는 것처럼 보이나,
 			   실제로는  TweenMax 의  render  메서드를 호출한다.
 
 			   주의해야 할 것은  delay  값은 음수화 되어 넘어간다.
+
+			   immediateRender 는 from(), fromTo() 등에서는 기본적으로 true 이고 to 의 경우는 값이 설정되지 않는다.
+			   그럼 어떻게 랜더링을?
 			 */
 			if (this.vars.immediateRender || (duration == 0 && _delay == 0 && this.vars.immediateRender != false)) {
 				render(-_delay, false, true);

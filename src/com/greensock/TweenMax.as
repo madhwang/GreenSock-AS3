@@ -755,10 +755,12 @@ var a2 = TweenMax.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 			_dirty = true; //ensures that if there is any repeat, the _totalDuration will get recalculated to accurately report it. 반복이 있으면 _totalDuration이 정확하게 다시 계산되도록 다시 계산됩니다.
 			if (this.vars.onCompleteListener || this.vars.onUpdateListener || this.vars.onStartListener || this.vars.onRepeatListener || this.vars.onReverseCompleteListener) {
 				_initDispatcher();
-				if (_duration == 0) if (_delay == 0) if (this.vars.immediateRender) {
-					_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.UPDATE));
-					_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.COMPLETE));
-				}
+				if (_duration == 0)
+					if (_delay == 0)
+						if (this.vars.immediateRender) {
+							_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.UPDATE));
+							_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.COMPLETE));
+						}
 			}
 		}
 	
@@ -865,8 +867,11 @@ tween.updateTo({x:300, y:0}, false);
 		 *  @see com.greensock.core.Animation
 		 * @param time time (or frame number for frames-based tweens) to render.
 		 * @param suppressEvents If true, no events or callbacks will be triggered for this render (like onComplete, onUpdate, onReverseComplete, etc.)
+		 *          //true 인 경우이 렌더링에 대한 이벤트 또는 콜백이 트리거되지 않습니다 (onComplete, onUpdate, onReverseComplete 등).
+		 *
 		 * @param force Normally the tween will skip rendering if the time matches the cachedTotalTime (to improve performance), but if force is true, it forces a render. This is primarily used internally for tweens with durations of zero in TimelineLite/Max instances.
-		 * 일반적으로, 시간이 (성능을 향상시키기 위해) cachedTotalTime과 일치하면 트윈은 렌더링을 건너 뜁니다. 그러나 force가 true이면 렌더가 강제로 렌더링됩니다. 주로 TimelineLite / Max 인스턴스의 지속 시간이 0 인 트윈의 경우 내부적으로 사용됩니다.
+		 *         //일반적으로, 시간이 (성능을 향상시키기 위해) cachedTotalTime과 일치하면 트윈은 렌더링을 건너 뜁니다. 그러나 force가 true이면 렌더가 강제로 렌더링됩니다.
+		 *           주로 TimelineLite / Max 인스턴스의 지속 시간이 0 인 트윈의 경우 내부적으로 사용됩니다.
 		 */
 		override public function render(time:Number, suppressEvents:Boolean=false, force:Boolean=false):void {
 			if (!_initted) /* 애니메이션이 초기화되었는지 여부를 나타냅니다 (트윈의 경우 모든 트위닝 속성이 분석되고 시작 / 끝 값이 기록되는 경우 등). */
@@ -1012,7 +1017,7 @@ tween.updateTo({x:300, y:0}, false);
 			 */
 			if (prevTime == _time && !force && _cycle === prevCycle) {
 				if (prevTotalTime !== _totalTime)
-					if (_onUpdate != null)
+					if (_onUpdate != null) //onUpdate 시 콜백
 						if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
 							_onUpdate.apply(vars.onUpdateScope || this, vars.onUpdateParams);
 						}

@@ -210,6 +210,10 @@ Animation.ticker.removeEventListener("tick", myFunction);
 					_rootTimeline._startTime = getTimer() / 1000;
 					_rootFramesTimeline._startTime = 0;
 					_rootTimeline._active = _rootFramesTimeline._active = true;
+
+					/*
+					Event.ENTER_FRAME = "enterFrame"
+					 */
 					ticker.addEventListener("enterFrame", _updateRoot, false, 0, true);
 				} else {
 					return;
@@ -577,6 +581,12 @@ myAnimation.play(2, false);
 		/** @private This method gets called on every frame and is responsible for rendering/updating the root timelines. If you want to unhook the engine from its ticker, you could do <code>Animation.ticker.removeEventListener("enterFrame", _updateRoot)</code> and then call it yourself whenever you want to update. **/
 		public static function _updateRoot(event:Event=null):void {
 			_rootFrame++;
+			/*
+			 getTimer() - Flash 런타임이 초기화를 시작한 이후의  시간(밀리초)을 반환합니다
+			 _rootTimeline._startTime - Animaiton 생성자에서 세팅되는 값으로 getTimer() / 1000 와 같이 초값이고 시작시의 시간값이다.
+			  _rootTimeline._timeScale - 1 = 표준 속도, 0.5 = 1/2 속도, 2 = 2 배속 등의 애니메이션 시간을 조정하는 데 사용되는 요소입니다. 예를 들어 트윈의 지속 시간은 2이지만 <code> timeScale </ code>이 0.5 인 경우, 완료하려면 4 초가 걸립니다. <code> timeScale </ code>이 0.5 인 TimelineLite에 트윈을 중첩하면 완료하는 데 8 초가 걸립니다. 점차 느려지거나 속도를 높이려면 다른 트윈 (또는 타임 라인) <code> timeScale </ code>을 트위닝 할 수도 있습니다
+			  		TimelineLite 또는 TweenMax.globalTimeScale() 로 변경가능하다.
+			 */
 			_rootTimeline.render((getTimer() / 1000 - _rootTimeline._startTime) * _rootTimeline._timeScale, false, false);
 			_rootFramesTimeline.render((_rootFrame - _rootFramesTimeline._startTime) * _rootFramesTimeline._timeScale, false, false);
 			ticker.dispatchEvent(_tickEvent);
@@ -659,6 +669,7 @@ myAnimation.eventCallback("onComplete", myFunction); //sets the onComplete
 				} else {
 					vars[type] = callback;
 					vars[type + "Params"] = ((params is Array) && params.join("").indexOf("{self}") !== -1) ? _swapSelfInParams(params) : params;
+
 				}
 				if (type == "onUpdate") {
 					_onUpdate = callback;
