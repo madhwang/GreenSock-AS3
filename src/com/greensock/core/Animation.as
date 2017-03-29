@@ -226,7 +226,7 @@ public class Animation {
 				/*
 				 Event.ENTER_FRAME = "enterFrame"  으로 상수가 존재.
 				 */
-				ticker.addEventListener("enterFrame", _updateRoot, false, 0, true);
+				ticker.addEventListener("enterFrame", _updateRoot, false, 0, true); //updateRoot = 597
 			} else {
 				return;
 			}
