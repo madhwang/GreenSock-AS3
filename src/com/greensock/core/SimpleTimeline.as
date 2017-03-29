@@ -103,16 +103,15 @@ public class SimpleTimeline extends Animation {
 			}
 
 		/* Animation  의 멤버변수.  readonly.  부모 타임라인. 178   라인
-		 * 부모타임 라인이 있으면 즉, 이미 있는  child  이면.
+		 * 부모타임 라인이 있으면 즉, 이미 있는  인스턴스를 또 추가하려는 경우 .
 		 *  timeline 은  readonly. 모든  tweenmax/lite 인스턴스에 존재.
-
 		 * */
 		if (child.timeline) {
 			child.timeline._remove(child, true); //removes from existing timeline so that it can be properly added to this one.
 		}
 
 		/*
-		 timeline -   readonly  라며?
+		 timeline -   readonly  라며? Animation:185
 		 child  의 부모타임(timeline)  과 가장 최근의 상위 타임라인(_timeline :  Animation. 170) 을  this 로 세팅
 		 */
 		child.timeline = child._timeline = this;
@@ -123,7 +122,7 @@ public class SimpleTimeline extends Animation {
 		}
 
 		var prevTween:Animation = _last;
-		if (_sortChildren) {
+		if (_sortChildren) { /* TimelineLite 에서 사용 */
 			var st:Number = child._startTime;
 			while (prevTween && prevTween._startTime > st) {
 				prevTween = prevTween._prev;
