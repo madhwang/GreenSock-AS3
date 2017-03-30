@@ -975,6 +975,8 @@ tween.updateTo({x:300, y:0}, false);
 						_time = 0;
 					}
 				}
+
+
 				if (_easeType) {
 					/*  _time = time  이 된다*/
 					var r:Number = _time / _duration, type:int = _easeType, pow:int = _easePower;
